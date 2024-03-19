@@ -1,6 +1,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "driver/gpio.h"
+#include "esp_log.h"
 
 #define BLINK_GPIO 2
 
@@ -11,17 +12,17 @@ static void configure_led(void) {
 }
 
 static void blink_led(void) {
-    int currentState = gpio_get_level(BLINK_GPIO);
-    gpio_set_level(BLINK_GPIO, !currentState);
+    int nextState = !gpio_get_level(BLINK_GPIO);
+    gpio_set_level(BLINK_GPIO, nextState);
+    if(nextState)
+        ESP_LOGI("LED", "LED ON");
+    else
+        ESP_LOGI("LED", "LED OFF");
 }
 
 void app_main(void) {
-
-    /* Configure the peripheral according to the LED type */
     configure_led();
-
     while (1) {
-        /* Toggle the LED state */
         blink_led();
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
